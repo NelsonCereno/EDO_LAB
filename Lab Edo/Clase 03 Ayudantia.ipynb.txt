@@ -1,0 +1,573 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "7a185787-68ce-44e5-9b36-3264f68db4b1",
+   "metadata": {},
+   "source": [
+    "### pip install sympy==1.13.3 scipy==1.15.2 numpy==2.2.4 matplotlib==3.10.1"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "095532bc-6c19-4fbd-9836-9910602e6f6c",
+   "metadata": {},
+   "source": [
+    "# RECORDEMOS COMO DEFINIR UNA EDO DE PRIMER ORDEN"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "f868dc16",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import sympy as sp\n",
+    "import matplotlib.pyplot as plt\n",
+    "\n",
+    "sp.init_printing(use_latex='mathjax') \n",
+    "\n",
+    "x = sp.Symbol('x', real=True)\n",
+    "y = sp.Function('y')\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7b1f922f-3028-443b-8f83-ac36ef46167e",
+   "metadata": {},
+   "source": [
+    "# METODO DE EULER"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "38632e2e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "\n",
+    "def Euler(f,x0,xn,y0,n): #nuestra función se llama Euler y sus datos de entrada son f,x0,xn,y0,n\n",
+    "    X = np.linspace(x0,xn,n+1)         \n",
+    "    Y = np.linspace(x0,xn,n+1)                 \n",
+    "    Y[0] = y0\n",
+    "    h=(xn-x0)/n\n",
+    "    for i in range(n):\n",
+    "        Y[i+1] = Y[i] + h*f(X[i],Y[i])\n",
+    "    return Y"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d7ebbae5-7f97-4eb9-bd96-0a0bb750e307",
+   "metadata": {},
+   "source": [
+    "# METODO RK4"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "f6ed7695",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def RK4(f, x0, xn, y0, n):\n",
+    "    X = np.linspace(x0,xn,n+1)\n",
+    "    Y = np.linspace(x0,xn,n+1)                 \n",
+    "    Y[0] = y0\n",
+    "    h = (xn-x0)/n     \n",
+    "    for i in range(n):\n",
+    "        K1=f(X[i],Y[i]) \n",
+    "        K2=f(X[i]+h/2,Y[i]+(h/2)*K1) \n",
+    "        K3=f(X[i]+h/2,Y[i]+(h/2)*K2) \n",
+    "        K4=f(X[i]+h,Y[i]+h*K3)\n",
+    "        Y[i+1] = Y[i] +(h/6)*(K1+2*K2+2*K3+K4)\n",
+    "    return Y[-1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5f4097e8",
+   "metadata": {},
+   "source": [
+    "# Y el calculo del error"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ee8f012c-ac34-4acf-9ed8-1a91147f61df",
+   "metadata": {},
+   "source": [
+    "valor absoluto entre la resta del valor original y el metodo aplicado, dividido por el valor original y luego multiplicada por 100"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cf1d847b",
+   "metadata": {},
+   "source": [
+    "Si queremos que el resultado se muestre con más valores después de la coma, hacemos:"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "id": "82244f59",
+   "metadata": {},
+   "source": [
+    "### Ejercicio 01\n",
+    "\n",
+    "Considere el problema de valores iniciales:\n",
+    "\n",
+    "$$ y'=\\dfrac{y}{x}+x\\mathrm{e}^{-\\frac{y}{x}} \\quad ; \\quad y(1)=2.$$\n",
+    "\n",
+    "* a) Utilice el método de Euler para encontrar una aproximación de $y(11)$ donde $h=1$.\n",
+    "* b) Usando Python resuelva la ecuación y determine si es una buena aproximación (haga un análisis del error obtenido)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "61eb8555-822e-4651-80f5-5da59c9ca12f",
+   "metadata": {},
+   "source": [
+    "# A)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "77477695",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def g(x,y): return (y/x) + x*sp.exp(-y/x)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "5e450e89",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 30.2732859985569$"
+      ],
+      "text/plain": [
+       "np.float64(30.273285998556908)"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "euler1 = Euler(g,1,11,2,10)[-1]\n",
+    "euler1"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4fb81ec0-c010-4a86-b339-b9189f2ad5a4",
+   "metadata": {},
+   "source": [
+    "# B)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "ac32adbc-8b53-48fc-895f-d88fb0bc160e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 31.4142515336177$"
+      ],
+      "text/plain": [
+       "31.4142515336177"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "f = (y(x)/x) + x*sp.exp(-y(x)/x)\n",
+    "sol = sp.dsolve(y(x).diff(x) - f, ics={y(1):2})\n",
+    "sol2 = sol.rhs\n",
+    "sol3 = sol2.subs(x,11).evalf()\n",
+    "sol3"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "8cfe9ddf-9df5-417e-bb63-31b0dfde5d3d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 3.6319997433006$"
+      ],
+      "text/plain": [
+       "3.63199974330060"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.abs((sol3 - euler1)/sol3)*100"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ff7926b7",
+   "metadata": {},
+   "source": [
+    "### Ejercicio 03: \n",
+    "\n",
+    "La ecuación\n",
+    "$$\\frac{dP}{dt}=kP\\left(1-\\frac{P}{N} \\right)-a$$\n",
+    "representa unn modelo logístico de crecimiento poblacional con cosecha constante.\n",
+    "\n",
+    "Para una cierta variedad de pez comestible, se considera $a=0.5$, $k=3$ y $N=10$, donde $N$ y $P(t)$ están medidas en miles.\n",
+    "\n",
+    "Suponga que en el instante $t=0$ (medido en días) la población inicial de peces es $2600$.\n",
+    "\n",
+    "* a) Use el método RK4 para estimar la población de peces al cabo de una semana.\n",
+    "\n",
+    "* b) Estime la cantidad de peces diarios al cabo de un año completo. ¿La población de peces se estabiliza después de cierto tiempo? ¿Qué se espera de $P(t)$ si $t \\to \\infty$?\n",
+    "\n",
+    "* c) La EDO resultante es autónoma. Utilice técnicas cualitativas para corroborar los resultados anteriores.\n",
+    "\n",
+    "* d) Resuelva la EDO vía separación de variables, luego calcule la población al cabo de un año. Compruebe si sus resultados coinciden con los obtenidos anteriormente."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "186eede3-ad2a-45b9-8fda-bdbfea7ebfd8",
+   "metadata": {},
+   "source": [
+    "p(0)=2600 ics={y()}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "37d93406-181f-4c90-ac70-36be320db2e4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "a = 0.5\n",
+    "k = 3\n",
+    "N = 10\n",
+    "\n",
+    "t = sp.Symbol('t', real=True)\n",
+    "P = sp.Function('P')\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2b76c64f-674c-4ef5-a73c-3f458267017a",
+   "metadata": {},
+   "source": [
+    "A)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "dacba104-552f-4126-b21a-b357fb9ee14d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 9.83045893027182$"
+      ],
+      "text/plain": [
+       "np.float64(9.830458930271815)"
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# def RK4(f, x0, xn, y0, n)\n",
+    "\n",
+    "def h(x,y): return (k*y*(1-(y/N)) - a)\n",
+    "\n",
+    "# en una semana hay 7 dias\n",
+    "\n",
+    "# debido a un problema con overflow, aumentamos la cantidad de iteraciones de 10 a 10000\n",
+    "RK4(h, 0, 7, 2600, 10000)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b1a533ad-3323-4a59-8546-48d52098df2b",
+   "metadata": {},
+   "source": [
+    "# B)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "3e1412c9-f3d9-4173-b7a1-4fb2a5d5ee85",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 9.83045891539647$"
+      ],
+      "text/plain": [
+       "np.float64(9.830458915396472)"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# P(t) bajarlo a 2.6\n",
+    "RK4(h, 0, 365, 2.6, 10000)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "id": "b6979dc3-eb5c-4081-92f1-55ed25d75315",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 9.83045891539648$"
+      ],
+      "text/plain": [
+       "np.float64(9.830458915396479)"
+      ]
+     },
+     "execution_count": 75,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "RK4(h, 0, 5*365, 2.6, 10000)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "id": "51f518ab-b01b-477e-8a58-b76f65da8c6e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 9.83045891539648$"
+      ],
+      "text/plain": [
+       "np.float64(9.83045891539648)"
+      ]
+     },
+     "execution_count": 76,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "RK4(h, 0, 10*365, 2.6, 10000)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "274a7ff4-0f2d-4054-aafe-1064a04c3bf2",
+   "metadata": {},
+   "source": [
+    "c)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "id": "7ef72623-986d-4c38-8734-081fe630f20e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/latex": [
+       "$\\displaystyle 9.83045891539648$"
+      ],
+      "text/plain": [
+       "9.83045891539648"
+      ]
+     },
+     "execution_count": 78,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sp.solve(k*x*(1-(x/N)) - a)[-1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2e595edb-198d-49e8-9a2a-aba029e1d7a3",
+   "metadata": {},
+   "source": [
+    "# D)\n",
+    "## me dio en la integral por parte del y, esto: 💀💀💀💀💀💀💀💀💀💀💀💀\n",
+    "### Muy probable es tambien el porque tuimos overflow"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ec0fd07c-4446-4e31-97b2-a51d93039bdc",
+   "metadata": {},
+   "source": [
+    "$$\n",
+    "-\\frac{5 \\ln\\left(\\frac{\\left|3y + \\frac{-2 \\sqrt{210} - 30}{2}\\right|}{\\left|3y + \\frac{2 \\sqrt{210} - 30}{2}\\right|}\\right)}{\\sqrt{210}}\n",
+    "$$\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2a354583-b842-452c-be2f-f239481e514e",
+   "metadata": {},
+   "source": [
+    "# Mas Ejercicios\n",
+    "\n",
+    "## Ejercicio 01\n",
+    "$$\\frac{dy}{dx} = \\frac{y}{x} + xe^{-\\frac{y}{x}}, \\quad y(1) = 2$$\n",
+    "\n",
+    "* A) Método de Euler con h = 1 para y(11)\n",
+    "* B) Solución exacta y porcentaje de error\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 02\n",
+    "$$\\frac{dy}{dx} = 0.2xy, \\quad y(0) = 1$$\n",
+    "\n",
+    "* A) RK4 con h = 1 para y(4)\n",
+    "* B) Solución exacta y porcentaje de error\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 03\n",
+    "$$\\frac{dP}{dt} = 3P\\left(1-\\frac{P}{10}\\right) - 0.5, \\quad P(0)=2.6$$\n",
+    "\n",
+    "* A) RK4 para P(7 días)\n",
+    "* B) Estabilidad a largo plazo (t->oo)\n",
+    "* C) Análisis cualitativo\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 04\n",
+    "$$\\frac{dy}{dx} = \\frac{y}{x} + x\\cos\\left(\\frac{y}{x}\\right), \\quad y(1)=0$$\n",
+    "\n",
+    "* A) Euler con h = 0.5 para y(3)\n",
+    "* B) Porcentaje de error\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 05\n",
+    "$$\\frac{dy}{dx} = 1 + \\frac{y}{x}, \\quad y(1)=2$$\n",
+    "\n",
+    "* A) RK4 con h = 0.25 para y(2)\n",
+    "* B) Comparación exacta\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 06\n",
+    "$$\\frac{dv}{dt} = 9.8 - 0.1v, \\quad v(0)=0$$\n",
+    "\n",
+    "* A) RK4 con h = 0.1 para v(2)\n",
+    "* B) Velocidad límite\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 07\n",
+    "$$\\frac{dP}{dt} = 2P\\left(1-\\frac{P}{100}\\right) - \\frac{P^2}{200}, \\quad P(0)=10$$\n",
+    "\n",
+    "* A) Euler con h = 1 para P(5)\n",
+    "* B) Puntos de equilibrio\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 08\n",
+    "$$\\frac{dy}{dx} = y - x^2 + 1, \\quad y(0)=0.5$$\n",
+    "\n",
+    "* A) RK4 con h = 0.2 para y(1)\n",
+    "* B) Euler con h = 0.2 para y(1)\n",
+    "\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 09\n",
+    "$$\\frac{dy}{dx} = \\frac{e^{-y}}{x}, \\quad y(1)=0$$\n",
+    "\n",
+    "* A) Solución exacta\n",
+    "* B) Euler con h = 0.5 para y(3)\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Ejercicio 10\n",
+    "$$\\frac{dT}{dt} = -0.1(T-20), \\quad T(0)=100$$\n",
+    "\n",
+    "* A) RK4 con h = 1 para T(10)\n",
+    "* B) Solución exacta"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5d73251c-01f7-4c1e-8f03-42e71a6e6b71",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
